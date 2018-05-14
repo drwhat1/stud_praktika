@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Phones.Models.Phone>
+
+@{
+    ViewBag.Title = "Таблицы API";
+    WebGrid grid = new WebGrid(Model);
+}
+
+@grid.GetHtml(columns: grid.Columns(grid.Column("ID", "ID"),
+                                    grid.Column("Name", "Наименование"),
+                                    grid.Column("CompanyID" ,header: "Компания", format: item => ViewBag.Companies.Find(item.CompanyID).Name)))
+
