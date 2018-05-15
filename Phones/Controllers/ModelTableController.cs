@@ -13,7 +13,6 @@ namespace Phones.Controllers
         // GET: PhonesTable
         public ActionResult Phones()
         {
-            ViewBag.Companies = db.Companies;
             return View(db.Phones.ToList());
         }
         public ActionResult Companies()

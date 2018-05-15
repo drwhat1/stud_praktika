@@ -12,5 +12,7 @@ namespace Phones.Models
         public string Location { get; set; }
         public DateTime DateOfFoundation { get; set; }
         public bool Active { get; set; }
+
+        public virtual IEnumerable<Phone> Phones { get; set; }
     }
 }
