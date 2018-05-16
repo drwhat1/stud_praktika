@@ -14,23 +14,26 @@ namespace Phones.Controllers
         ModelsContext db = new ModelsContext();
         
         // GET api/<controller>
-        public IEnumerable<Phone> GetPhones()
+        public IHttpActionResult GetPhones()
         {
-            return db.Phones;
+            return Json(db.Phones.ToList());
         }
 
         // GET api/<controller>/5
-        public Phone GetPhone(int id)
+        public IHttpActionResult GetPhone(int id)
         {
-            return db.Phones.Find(id);
+            return Json(db.Phones.Find(id));
         }
 
         // POST api/<controller>
         [HttpPost]
         public void AddPhone(Phone phone)
         {
-            db.Phones.Add(phone);
-            db.SaveChanges();
+            if (ModelState.IsValid)
+            {
+                db.Phones.Add(phone);
+                db.SaveChanges();
+            }
         }
 
         // PUT api/<controller>/5
@@ -42,6 +45,12 @@ namespace Phones.Controllers
                 db.Entry(phone).State = EntityState.Modified;
                 db.SaveChanges();
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) db.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

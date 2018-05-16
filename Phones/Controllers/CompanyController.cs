@@ -13,21 +13,24 @@ namespace Phones.Controllers
     {
         ModelsContext db = new ModelsContext();
 
-        public IEnumerable<Company> GetCompanies()
+        public IHttpActionResult GetCompanies()
         {
-            return db.Companies;
+            return Json(db.Companies.ToList());
         }
 
-        public Company GetCompany(int id)
+        public IHttpActionResult GetCompany(int id)
         {
-            return db.Companies.Find(id);
+            return Json(db.Companies.Find(id));
         }
 
         [HttpPost]
         public void AddCompany(Company company)
         {
-            db.Companies.Add(company);
-            db.SaveChanges();
+            if (ModelState.IsValid)
+            {
+                db.Companies.Add(company);
+                db.SaveChanges();
+            }
         }
 
         [HttpPut]
@@ -38,6 +41,12 @@ namespace Phones.Controllers
                 db.Entry(company).State = EntityState.Modified;
                 db.SaveChanges();
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) db.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

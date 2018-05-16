@@ -19,5 +19,19 @@ namespace Phones.Controllers
         {
             return View(db.Companies.ToList());
         }
+        public ActionResult AddPhone()
+        {
+            List<SelectListItem> CompList = new List<SelectListItem>();
+            foreach (var c in db.Companies)
+            {
+                CompList.Add(new SelectListItem { Text=c.Name, Value=c.ID.ToString() });
+            }
+            ViewData["CompanyID"] = CompList;
+            return View();
+        }
+        public ActionResult AddCompany()
+        {
+            return View();
+        }
     }
 }

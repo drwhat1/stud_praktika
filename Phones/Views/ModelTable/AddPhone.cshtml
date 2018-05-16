@@ -1,0 +1,30 @@
+﻿@model Phones.Models.Phone
+
+@{
+    ViewBag.Title = "AddPhone";
+}
+
+<div>
+    <form action="~/api/phone" method="post">
+        @Html.ValidationSummary()
+        <p>
+            <div class="editor-label">
+                @Html.LabelFor(p => p.Name)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(p => p.Name)
+                @Html.ValidationMessageFor(p => p.Name)
+            </div>
+        </p>
+        <p>
+            <div class="editor-label">
+                @Html.LabelFor(p => p.CompanyID)
+            </div>
+            <div class="editor-field">
+                @Html.DropDownList("CompanyID", optionLabel: "Выберите компанию")
+                @Html.ValidationMessageFor(p => p.CompanyID)
+            </div>
+        </p>
+        <p><input class="btn btn-default" type="submit" value="Добавить"></p>
+    </form>
+</div>
