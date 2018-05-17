@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Phones.Models.Company>
+
+@{
+    ViewBag.Title = "EditCompany";
+    WebGrid grid = new WebGrid(Model);
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $("#save").click(function (event) {
+            event.preventDefault();
+            $.ajax("/api/company/@Model.First().ID", {
+                type: "PUT",
+                data: $("#putForm").serialize(),
+            })
+        })
+    </script>
+}
+
+<form id="putForm">
+    @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden" />),
+                grid.Column("Name", "Название", format: item => Html.EditorFor(m=>m.First().Name)),
+                     grid.Column("Location", "Штаб-квартира", format: @<input name="Location" value="@item.Location" />),
+                         grid.Column("DateOfFoundation", "Дата основания", format: @<input name="DateOfFoundation" value="@item.DateOfFoundation.ToString("yyyy-MM-dd")" type="date" />),
+                             grid.Column("Active", "Работает", format: item => Html.CheckBoxFor(m => m.First().Active))))
+
+    <button id="save">Сохранить</button>
+</form>

@@ -19,19 +19,25 @@ namespace Phones.Controllers
         {
             return View(db.Companies.ToList());
         }
-        public ActionResult AddPhone()
+        public ActionResult EditPhone(int id)
         {
+            List<Phone> phone = new List<Phone> { db.Phones.Find(id) };
+
             List<SelectListItem> CompList = new List<SelectListItem>();
             foreach (var c in db.Companies)
             {
-                CompList.Add(new SelectListItem { Text=c.Name, Value=c.ID.ToString() });
+                if (phone.First().CompanyID!=c.ID) CompList.Add(new SelectListItem { Text = c.Name, Value = c.ID.ToString() });
+                else CompList.Add(new SelectListItem { Text = c.Name, Value = c.ID.ToString(), Selected = true });
             }
             ViewData["CompanyID"] = CompList;
-            return View();
+
+            return View(phone);
         }
-        public ActionResult AddCompany()
+        public ActionResult EditCompany(int id)
         {
-            return View();
+            List<Company> company = new List<Company> { db.Companies.Find(id) };
+
+            return View(company);
         }
     }
 }

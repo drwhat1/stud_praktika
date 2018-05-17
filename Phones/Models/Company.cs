@@ -26,5 +26,7 @@ namespace Phones.Models
         [Required]
         [Display(Name = "Работает")]
         public bool Active { get; set; }
+
+        public virtual IEnumerable<Phone> Phones { get; set; }
     }
 }

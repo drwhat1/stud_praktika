@@ -1,12 +1,9 @@
 ﻿@model IEnumerable<Phones.Models.Phone>
-
 @{
     ViewBag.Title = "Таблицы API";
     WebGrid grid = new WebGrid(Model);
 }
-
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Наименование"),
-                                    grid.Column("Company.Name",header: "Компания")))
-<p><a class="btn btn-default" href="~/ModelTable/AddPhone">Создать</a></p>
-
+                                    grid.Column("Company.Name",header: "Компания"),
+                                    grid.Column(format: @<a href="~/ModelTable/EditPhone/@item.ID">Редактировать</a>)))

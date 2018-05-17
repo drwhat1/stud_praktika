@@ -14,15 +14,15 @@ namespace Phones.Controllers
         ModelsContext db = new ModelsContext();
         
         // GET api/<controller>
-        public IHttpActionResult GetPhones()
+        public IEnumerable<Phone> GetPhones()
         {
-            return Json(db.Phones.ToList());
+            return db.Phones;
         }
 
         // GET api/<controller>/5
-        public IHttpActionResult GetPhone(int id)
+        public Phone GetPhone(int id)
         {
-            return Json(db.Phones.Find(id));
+            return db.Phones.Find(id);
         }
 
         // POST api/<controller>
@@ -38,19 +38,15 @@ namespace Phones.Controllers
 
         // PUT api/<controller>/5
         [HttpPut]
-        public void EditPhone(int id, Phone phone)
+        public string EditPhone(int id, Phone phone)
         {
-            if (id == phone.ID)
+            if (id == phone.ID && ModelState.IsValid)
             {
                 db.Entry(phone).State = EntityState.Modified;
                 db.SaveChanges();
+                return "Nice";
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) db.Dispose();
-            base.Dispose(disposing);
+            return "Not nice";
         }
     }
 }

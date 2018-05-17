@@ -242,9 +242,7 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -260,8 +258,8 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\ModelTable\Companies.cshtml" />
     <Content Include="Views\ModelTable\Phones.cshtml" />
-    <Content Include="Views\ModelTable\AddPhone.cshtml" />
-    <Content Include="Views\ModelTable\AddCompany.cshtml" />
+    <Content Include="Views\ModelTable\EditPhone.cshtml" />
+    <Content Include="Views\ModelTable\EditCompany.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

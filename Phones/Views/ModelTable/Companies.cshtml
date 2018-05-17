@@ -1,13 +1,11 @@
 ﻿@model IEnumerable<Phones.Models.Company>
-
 @{
     ViewBag.Title = "Таблицы API";
     WebGrid grid = new WebGrid(Model);
 }
-
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Название"),
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
-                                    grid.Column("Active" ,header: "Работает", format: item => item.Active ? "Да" : "Нет")))
-<p><a class="btn btn-default" href="~/ModelTable/AddCompany">Создать</a></p>
+                                    grid.Column("Active" ,header: "Работает", format: item => item.Active ? "Да" : "Нет"),
+                                    grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>)))

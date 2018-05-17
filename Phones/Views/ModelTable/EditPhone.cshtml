@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Phones.Models.Phone>
+
+@{
+    ViewBag.Title = "EditPhone";
+    WebGrid grid = new WebGrid(Model);
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $("#save").click(function (event) {
+            event.preventDefault();
+            $.ajax("/api/phone/@Model.First().ID", {
+                type: "PUT",
+                data: $("#putForm").serialize()
+            })
+        })
+    </script>
+}
+
+    <form id="putForm">
+        @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden"/>),
+                                                     grid.Column("Name", "Наименование", format: @<input name="Name" value="@item.Name" />),
+                                                     grid.Column("CompanyID", "Компания", format: item => Html.DropDownList("CompanyID"))))
+
+        <button id="save">Сохранить</button>
+    </form>

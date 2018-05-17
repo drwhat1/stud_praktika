@@ -13,14 +13,14 @@ namespace Phones.Controllers
     {
         ModelsContext db = new ModelsContext();
 
-        public IHttpActionResult GetCompanies()
+        public IEnumerable<Company> GetCompanies()
         {
-            return Json(db.Companies.ToList());
+            return db.Companies;
         }
 
-        public IHttpActionResult GetCompany(int id)
+        public Company GetCompany(int id)
         {
-            return Json(db.Companies.Find(id));
+            return db.Companies.Find(id);
         }
 
         [HttpPost]
@@ -36,17 +36,11 @@ namespace Phones.Controllers
         [HttpPut]
         public void EditCompany(int id, Company company)
         {
-            if (id == company.ID)
+            if (id == company.ID && ModelState.IsValid)
             {
                 db.Entry(company).State = EntityState.Modified;
                 db.SaveChanges();
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) db.Dispose();
-            base.Dispose(disposing);
         }
     }
 }
