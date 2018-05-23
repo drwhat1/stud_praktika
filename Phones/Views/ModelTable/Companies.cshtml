@@ -7,5 +7,5 @@
                                     grid.Column("Name", "Название"),
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
-                                    grid.Column("Active" ,header: "Работает", format: item => item.Active ? "Да" : "Нет"),
+                                    grid.Column("Active" ,header: "Активно", format: item => item.Active ? "Да" : "Нет"),
                                     grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>)))

@@ -14,15 +14,15 @@ namespace Phones.Controllers
         ModelsContext db = new ModelsContext();
         
         // GET api/<controller>
-        public IEnumerable<Phone> GetPhones()
+        public IHttpActionResult GetPhones()
         {
-            return db.Phones;
+            return Json(db.Phones);
         }
 
         // GET api/<controller>/5
-        public Phone GetPhone(int id)
+        public IHttpActionResult GetPhone(int id)
         {
-            return db.Phones.Find(id);
+            return Json(db.Phones.Find(id));
         }
 
         // POST api/<controller>
@@ -38,15 +38,15 @@ namespace Phones.Controllers
 
         // PUT api/<controller>/5
         [HttpPut]
-        public string EditPhone(int id, Phone phone)
+        public IHttpActionResult EditPhone(int id, Phone phone)
         {
-            if (id == phone.ID && ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 db.Entry(phone).State = EntityState.Modified;
                 db.SaveChanges();
-                return "Nice";
+                return Ok();
             }
-            return "Not nice";
+            else return BadRequest(ModelState);
         }
     }
 }

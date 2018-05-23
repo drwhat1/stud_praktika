@@ -13,14 +13,14 @@ namespace Phones.Controllers
     {
         ModelsContext db = new ModelsContext();
 
-        public IEnumerable<Company> GetCompanies()
+        public IHttpActionResult GetCompanies()
         {
-            return db.Companies;
+            return Json(db.Companies);
         }
 
-        public Company GetCompany(int id)
+        public IHttpActionResult GetCompany(int id)
         {
-            return db.Companies.Find(id);
+            return Json(db.Companies.Find(id));
         }
 
         [HttpPost]
@@ -34,13 +34,19 @@ namespace Phones.Controllers
         }
 
         [HttpPut]
-        public void EditCompany(int id, Company company)
+        public IHttpActionResult EditCompany(int id, Company company)
         {
-            if (id == company.ID && ModelState.IsValid)
+            if (company.DateOfFoundation.Date == new DateTime(1,1,1))
+                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания");
+            else if (company.DateOfFoundation.Year < 1753)
+                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753");
+            if (ModelState.IsValid)
             {
                 db.Entry(company).State = EntityState.Modified;
                 db.SaveChanges();
+                return Ok();
             }
+            else return BadRequest(ModelState);
         }
     }
 }

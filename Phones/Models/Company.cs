@@ -18,13 +18,11 @@ namespace Phones.Models
         [Display(Name = "Штаб-квартира")]
         public string Location { get; set; }
 
-        [Required]
-        [DataType(DataType.Date)]
         [Display(Name = "Дата основания")]
         public DateTime DateOfFoundation { get; set; }
 
         [Required]
-        [Display(Name = "Работает")]
+        [Display(Name = "Активно")]
         public bool Active { get; set; }
 
         public virtual IEnumerable<Phone> Phones { get; set; }

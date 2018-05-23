@@ -19,9 +19,12 @@ namespace Phones.Controllers
         {
             return View(db.Companies.ToList());
         }
-        public ActionResult EditPhone(int id)
+        public ActionResult EditPhone(int? id)
         {
-            List<Phone> phone = new List<Phone> { db.Phones.Find(id) };
+            List<Phone> phone;
+            if (id != null)
+                phone = new List<Phone> { db.Phones.Find(id) };
+            else return HttpNotFound();
 
             List<SelectListItem> CompList = new List<SelectListItem>();
             foreach (var c in db.Companies)
@@ -33,9 +36,12 @@ namespace Phones.Controllers
 
             return View(phone);
         }
-        public ActionResult EditCompany(int id)
+        public ActionResult EditCompany(int? id)
         {
-            List<Company> company = new List<Company> { db.Companies.Find(id) };
+            List<Company> company;
+            if (id != null)
+                company = new List<Company> { db.Companies.Find(id) };
+            else return HttpNotFound();
 
             return View(company);
         }

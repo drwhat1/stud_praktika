@@ -7,22 +7,46 @@
 
 @section scripts{
     <script type="text/javascript">
+        function addError(jsObj,field) {
+            $.each(jsObj['ModelState'][field], function (index, item) {
+                $('#errors').append("<p>" + item + "</p>");
+            });
+        }
+
         $("#save").click(function (event) {
             event.preventDefault();
             $.ajax("/api/company/@Model.First().ID", {
                 type: "PUT",
+                dataType: 'json',
                 data: $("#putForm").serialize(),
+                success: function () {
+                    document.location.replace("/ModelTable/Companies");
+                },
+                error: function (jxqr, error, status) {
+                    var response = jxqr.responseJSON;
+                    $('#errors').empty();
+                    if (response['ModelState']['company.Name']) {
+                        addError(response, 'company.Name');
+                    }
+                    if (response['ModelState']['company.Location']) {
+                        addError(response, 'company.Location');
+                    }
+                    if (response['ModelState']['company.DateOfFoundation']) {
+                        addError(response, 'company.DateOfFoundation');
+                    }
+                }
             })
         })
     </script>
 }
 
-<form id="putForm">
-    @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden" />),
-                grid.Column("Name", "Название", format: item => Html.EditorFor(m=>m.First().Name)),
-                     grid.Column("Location", "Штаб-квартира", format: @<input name="Location" value="@item.Location" />),
-                         grid.Column("DateOfFoundation", "Дата основания", format: @<input name="DateOfFoundation" value="@item.DateOfFoundation.ToString("yyyy-MM-dd")" type="date" />),
-                             grid.Column("Active", "Работает", format: item => Html.CheckBoxFor(m => m.First().Active))))
+    <form id="putForm">
+        <div id="errors" style="color:red;"></div>
+        @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden" />),
+                      grid.Column("Name", "Название", format: @<input name="Name" value="@item.Name" required/>),
+                              grid.Column("Location", "Штаб-квартира", format: @<input name="Location" value="@item.Location" required/>),
+                                               grid.Column("DateOfFoundation", "Дата основания", format: @<input name="DateOfFoundation" value="@item.DateOfFoundation.ToString("yyyy-MM-dd")" type="date" required/>),
+                                                                  grid.Column("Active", "Активно", format: item => Html.CheckBoxFor(m => m.First().Active))))
 
-    <button id="save">Сохранить</button>
-</form>
+        <button id="save">Сохранить</button>
+    </form>

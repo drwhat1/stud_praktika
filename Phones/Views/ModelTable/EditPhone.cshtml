@@ -7,19 +7,37 @@
 
 @section scripts{
     <script type="text/javascript">
+        function addError(jsObj, field) {
+            $.each(jsObj['ModelState'][field], function (index, item) {
+                $('#errors').append("<p>" + item + "</p>");
+            });
+        }
+
         $("#save").click(function (event) {
             event.preventDefault();
             $.ajax("/api/phone/@Model.First().ID", {
                 type: "PUT",
-                data: $("#putForm").serialize()
+                dataType: 'json',
+                data: $("#putForm").serialize(),
+                success: function () {
+                    document.location.replace("/ModelTable/Phones");
+                },
+                error: function (jxqr, error, status) {
+                    var response = jxqr.responseJSON;
+                    $('#errors').empty();
+                    if (response['ModelState']['phone.Name']) {
+                        addError(response, 'phone.Name');
+                    }
+                }
             })
         })
     </script>
 }
 
     <form id="putForm">
+        <div id="errors" style="color:red;"></div>
         @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden"/>),
-                                                     grid.Column("Name", "Наименование", format: @<input name="Name" value="@item.Name" />),
+                                                     grid.Column("Name", "Наименование", format: @<input name="Name" value="@item.Name" required/>),
                                                      grid.Column("CompanyID", "Компания", format: item => Html.DropDownList("CompanyID"))))
 
         <button id="save">Сохранить</button>
