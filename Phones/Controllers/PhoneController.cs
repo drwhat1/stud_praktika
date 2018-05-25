@@ -27,13 +27,21 @@ namespace Phones.Controllers
 
         // POST api/<controller>
         [HttpPost]
-        public void AddPhone(Phone phone)
+        public IHttpActionResult AddPhone(Phone phone)
         {
+            if (phone.CompanyID == 0)
+            {
+                ModelState.Remove("phone.CompanyID");
+                ModelState.AddModelError("phone.CompanyID", "Выберите компанию.");
+            }
+
             if (ModelState.IsValid)
             {
                 db.Phones.Add(phone);
                 db.SaveChanges();
+                return Ok();
             }
+            else return BadRequest(ModelState);
         }
 
         // PUT api/<controller>/5

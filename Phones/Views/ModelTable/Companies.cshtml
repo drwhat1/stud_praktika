@@ -3,9 +3,84 @@
     ViewBag.Title = "Таблицы API";
     WebGrid grid = new WebGrid(Model);
 }
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            saveButtonClick();
+            btnclearClick();
+        })
+
+        function addErrors(jsObj, field) {
+            if (jsObj['ModelState'][field]) {
+                $.each(jsObj['ModelState'][field], function (index, item) {
+                    $('#errors').append("<p>" + item + "</p>");
+                });
+            }
+        }
+
+        function saveButtonClick() {
+            $("#save").click(function (event) {
+                event.preventDefault();
+                $.ajax("/api/company/", {
+                    type: "POST",
+                    data: $("#addform").serialize(),
+                    success: function () {
+                        document.location.reload();
+                    },
+                    error: function (jxqr, error, status) {
+                        var response = jxqr.responseJSON;
+                        $('#errors').empty();
+                        addErrors(response, 'company.Name');
+                        addErrors(response, 'company.Location');
+                        addErrors(response, 'company.DateOfFoundation');
+                    }
+                })
+            })
+        }
+
+        function btnclearClick() {
+            $(".btnclear").click(function (event) {
+                event.preventDefault();
+                $(".addInput").val("");
+                $("#addCompany").toggle();
+                $("#addform").toggle();
+                $('#errors').empty();
+            })
+        }
+    </script>
+}
+
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Название"),
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
                                     grid.Column("Active" ,header: "Активно", format: item => item.Active ? "Да" : "Нет"),
                                     grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>)))
+
+<div>
+    <form id="addform">
+        <p><div id="errors" style="color:red;"></div></p>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>@Html.LabelFor(c => c.First().Name)</th>
+                <th>@Html.LabelFor(c => c.First().Location)</th>
+                <th>@Html.LabelFor(c => c.First().DateOfFoundation)</th>
+                <th>@Html.LabelFor(c => c.First().Active)</th>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input class="addInput" name="Name" /></td>
+                <td><input class="addInput" name="Location" /></td>
+                <td><input class="addInput" name="DateOfFoundation" type="date" /></td>
+                <td>@Html.CheckBox("Active")</td>
+                <td></td>
+            </tr>
+        </table>
+        <button id="save" class="btn btn-primary">Сохранить</button>
+        <button id="cancel" class="btn btn-danger btnclear">Отмена</button>
+    </form>
+</div>
+
+<button class="btn btn-default btnclear" id="addCompany">Добавить</button>

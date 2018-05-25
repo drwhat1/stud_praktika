@@ -13,6 +13,8 @@ namespace Phones.Controllers
         // GET: PhonesTable
         public ActionResult Phones()
         {
+            SelectList CompList = new SelectList(db.Companies, "ID", "Name");
+            ViewData["CompanyID"] = CompList;
             return View(db.Phones.ToList());
         }
         public ActionResult Companies()
@@ -21,26 +23,21 @@ namespace Phones.Controllers
         }
         public ActionResult EditPhone(int? id)
         {
-            List<Phone> phone;
+            Phone phone = new Phone();
             if (id != null)
-                phone = new List<Phone> { db.Phones.Find(id) };
+                phone = db.Phones.Find(id);
             else return HttpNotFound();
 
-            List<SelectListItem> CompList = new List<SelectListItem>();
-            foreach (var c in db.Companies)
-            {
-                if (phone.First().CompanyID!=c.ID) CompList.Add(new SelectListItem { Text = c.Name, Value = c.ID.ToString() });
-                else CompList.Add(new SelectListItem { Text = c.Name, Value = c.ID.ToString(), Selected = true });
-            }
+            SelectList CompList = new SelectList(db.Companies,"ID","Name",phone.CompanyID);
             ViewData["CompanyID"] = CompList;
 
             return View(phone);
         }
         public ActionResult EditCompany(int? id)
         {
-            List<Company> company;
+            Company company = new Company();
             if (id != null)
-                company = new List<Company> { db.Companies.Find(id) };
+                company = db.Companies.Find(id);
             else return HttpNotFound();
 
             return View(company);

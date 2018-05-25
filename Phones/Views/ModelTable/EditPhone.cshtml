@@ -1,44 +1,67 @@
-﻿@model IEnumerable<Phones.Models.Phone>
+﻿@model Phones.Models.Phone
 
 @{
-    ViewBag.Title = "EditPhone";
-    WebGrid grid = new WebGrid(Model);
+    ViewBag.Title = "Редактирование телефона";
 }
 
 @section scripts{
     <script type="text/javascript">
-        function addError(jsObj, field) {
-            $.each(jsObj['ModelState'][field], function (index, item) {
-                $('#errors').append("<p>" + item + "</p>");
-            });
+        $(document).ready(function () {
+            saveClick();
+            cancelClick();
+        })
+
+        function addErrors(jsObj, field) {
+            if (jsObj['ModelState'][field]) {
+                $.each(jsObj['ModelState'][field], function (index, item) {
+                    $('#errors').append("<p>" + item + "</p>");
+                });
+            }
         }
 
-        $("#save").click(function (event) {
-            event.preventDefault();
-            $.ajax("/api/phone/@Model.First().ID", {
-                type: "PUT",
-                dataType: 'json',
-                data: $("#putForm").serialize(),
-                success: function () {
-                    document.location.replace("/ModelTable/Phones");
-                },
-                error: function (jxqr, error, status) {
-                    var response = jxqr.responseJSON;
-                    $('#errors').empty();
-                    if (response['ModelState']['phone.Name']) {
-                        addError(response, 'phone.Name');
+        function saveClick() {
+            $("#save").click(function (event) {
+                event.preventDefault();
+                $.ajax("/api/phone/@Model.ID", {
+                    type: "PUT",
+                    data: $("#putForm").serialize(),
+                    success: function () {
+                        document.location.replace("/ModelTable/Phones");
+                    },
+                    error: function (jxqr, error, status) {
+                        var response = jxqr.responseJSON;
+                        $('#errors').empty();
+                        addErrors(response, 'phone.Name');
                     }
-                }
+                })
             })
-        })
+        }
+
+        function cancelClick() {
+            $("#cancel").click(function (event) {
+                event.preventDefault();
+                document.location.replace("/ModelTable/Phones");
+            })
+        }
     </script>
 }
 
-    <form id="putForm">
-        <div id="errors" style="color:red;"></div>
-        @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden"/>),
-                                                     grid.Column("Name", "Наименование", format: @<input name="Name" value="@item.Name" required/>),
-                                                     grid.Column("CompanyID", "Компания", format: item => Html.DropDownList("CompanyID"))))
-
-        <button id="save">Сохранить</button>
-    </form>
+<form id="putForm">
+    <p><div id="errors" style="color:red;"></div></p>
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>@Html.LabelFor(p => p.Name)</th>
+            <th>@Html.LabelFor(p => p.CompanyID)</th>
+        </tr>
+        <tr>
+            <td><input name="ID" value="@Model.ID" type="hidden" readonly /></td>
+            <td>
+                <input name="Name" value="@Model.Name" required />
+            </td>
+            <td>@Html.DropDownList("CompanyID")</td>
+        </tr>
+    </table>
+    <button class="btn btn-primary" id="save">Сохранить</button>
+    <button id="cancel" class="btn btn-danger">Отмена</button>
+</form>

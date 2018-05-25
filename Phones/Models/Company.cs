@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Phones.Models
 {
     public class Company
     {
+        [HiddenInput(DisplayValue = false)]
         public int ID { get; set; }
 
         [Required]
@@ -19,6 +21,7 @@ namespace Phones.Models
         public string Location { get; set; }
 
         [Display(Name = "Дата основания")]
+        [DataType(DataType.Date)]
         public DateTime DateOfFoundation { get; set; }
 
         [Required]

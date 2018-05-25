@@ -24,22 +24,32 @@ namespace Phones.Controllers
         }
 
         [HttpPost]
-        public void AddCompany(Company company)
+        public IHttpActionResult AddCompany(Company company)
         {
+            ModelState.Remove("company.DateOfFoundation");
+            if (company.DateOfFoundation.Date == new DateTime(1, 1, 1))
+                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания.");
+            else if (company.DateOfFoundation.Year < 1753)
+                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753.");
+
             if (ModelState.IsValid)
             {
                 db.Companies.Add(company);
                 db.SaveChanges();
+                return Ok();
             }
+            else return BadRequest(ModelState);
         }
 
         [HttpPut]
         public IHttpActionResult EditCompany(int id, Company company)
         {
+            ModelState.Remove("company.DateOfFoundation");
             if (company.DateOfFoundation.Date == new DateTime(1,1,1))
-                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания");
+                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания.");
             else if (company.DateOfFoundation.Year < 1753)
-                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753");
+                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753.");
+
             if (ModelState.IsValid)
             {
                 db.Entry(company).State = EntityState.Modified;

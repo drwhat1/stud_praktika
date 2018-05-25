@@ -1,52 +1,71 @@
-﻿@model IEnumerable<Phones.Models.Company>
+﻿@model Phones.Models.Company
 
 @{
-    ViewBag.Title = "EditCompany";
-    WebGrid grid = new WebGrid(Model);
+    ViewBag.Title = "Редактирование компании";
 }
 
 @section scripts{
     <script type="text/javascript">
-        function addError(jsObj,field) {
-            $.each(jsObj['ModelState'][field], function (index, item) {
-                $('#errors').append("<p>" + item + "</p>");
-            });
+        $(document).ready(function () {
+            saveClick();
+            cancelClick();
+        })
+
+        function addErrors(jsObj, field) {
+            if (jsObj['ModelState'][field]) {
+                $.each(jsObj['ModelState'][field], function (index, item) {
+                    $('#errors').append("<p>" + item + "</p>");
+                });
+            }
         }
 
-        $("#save").click(function (event) {
-            event.preventDefault();
-            $.ajax("/api/company/@Model.First().ID", {
-                type: "PUT",
-                dataType: 'json',
-                data: $("#putForm").serialize(),
-                success: function () {
-                    document.location.replace("/ModelTable/Companies");
-                },
-                error: function (jxqr, error, status) {
-                    var response = jxqr.responseJSON;
-                    $('#errors').empty();
-                    if (response['ModelState']['company.Name']) {
-                        addError(response, 'company.Name');
+        function saveClick() {
+            $("#save").click(function (event) {
+                event.preventDefault();
+                $.ajax("/api/company/@Model.ID", {
+                    type: "PUT",
+                    data: $("#putForm").serialize(),
+                    success: function () {
+                        document.location.replace("/ModelTable/Companies");
+                    },
+                    error: function (jxqr, error, status) {
+                        var response = jxqr.responseJSON;
+                        $('#errors').empty();
+                        addErrors(response, 'company.Name');
+                        addErrors(response, 'company.Location');
+                        addErrors(response, 'company.DateOfFoundation');
                     }
-                    if (response['ModelState']['company.Location']) {
-                        addError(response, 'company.Location');
-                    }
-                    if (response['ModelState']['company.DateOfFoundation']) {
-                        addError(response, 'company.DateOfFoundation');
-                    }
-                }
+                })
             })
-        })
+        }
+
+        function cancelClick() {
+            $("#cancel").click(function (event) {
+                event.preventDefault();
+                document.location.replace("/ModelTable/Companies");
+            })
+        }
     </script>
 }
 
     <form id="putForm">
-        <div id="errors" style="color:red;"></div>
-        @grid.GetHtml("table", columns: grid.Columns(grid.Column(format: @<input name="ID" value="@item.ID" type="hidden" />),
-                      grid.Column("Name", "Название", format: @<input name="Name" value="@item.Name" required/>),
-                              grid.Column("Location", "Штаб-квартира", format: @<input name="Location" value="@item.Location" required/>),
-                                               grid.Column("DateOfFoundation", "Дата основания", format: @<input name="DateOfFoundation" value="@item.DateOfFoundation.ToString("yyyy-MM-dd")" type="date" required/>),
-                                                                  grid.Column("Active", "Активно", format: item => Html.CheckBoxFor(m => m.First().Active))))
-
-        <button id="save">Сохранить</button>
+        <p><div id="errors" style="color:red;"></div></p>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>@Html.LabelFor(c => c.Name)</th>
+                <th>@Html.LabelFor(c => c.Location)</th>
+                <th>@Html.LabelFor(c => c.DateOfFoundation)</th>
+                <th>@Html.LabelFor(c => c.Active)</th>
+            </tr>
+            <tr>
+                <td><input name="ID" value="@Model.ID" readonly type="hidden" /></td>
+                <td>@Html.EditorFor(c => c.Name)</td>
+                <td>@Html.EditorFor(c => c.Location)</td>
+                <td><input name="DateOfFoundation" value="@Model.DateOfFoundation.ToString("yyyy-MM-dd")" type="date" /></td>
+                <td>@Html.CheckBoxFor(c => c.Active)</td>
+            </tr>
+        </table>
+        <button id="save" class="btn btn-primary">Сохранить</button>
+        <button id="cancel" class="btn btn-danger">Отмена</button>
     </form>

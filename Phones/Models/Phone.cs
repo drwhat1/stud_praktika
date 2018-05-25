@@ -4,11 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Phones.Models
 {
     public class Phone
     {
+        [HiddenInput(DisplayValue = false)]
         public int ID { get; set; }
 
         [Required]

@@ -3,7 +3,82 @@
     ViewBag.Title = "Таблицы API";
     WebGrid grid = new WebGrid(Model);
 }
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            saveButtonClick();
+            btnclearClick();
+        })
+
+        function addErrors(jsObj, field) {
+            if (jsObj['ModelState'][field]) {
+                $.each(jsObj['ModelState'][field], function (index, item) {
+                    $('#errors').append("<p>" + item + "</p>");
+                });
+            }
+        }
+
+        function saveButtonClick() {
+            $("#save").click(function (event) {
+                event.preventDefault();
+                $.ajax("/api/phone/", {
+                    type: "POST",
+                    data: $("#addform").serialize(),
+                    success: function () {
+                        document.location.reload();
+                    },
+                    error: function (jxqr, error, status) {
+                        var response = jxqr.responseJSON;
+                        $('#errors').empty();
+                        addErrors(response, 'phone.Name');
+                        addErrors(response, 'phone.CompanyID');
+                    }
+                })
+            })
+        }
+
+        function btnclearClick() {
+            $(".btnclear").click(function (event) {
+                event.preventDefault();
+                $("#addPhone").toggle();
+                $("#addform").toggle();
+                $('#errors').empty();
+                $("#addName").val("");
+                $("#addCompany").val("");
+            })
+        }
+    </script>
+}
+
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Наименование"),
                                     grid.Column("Company.Name",header: "Компания"),
                                     grid.Column(format: @<a href="~/ModelTable/EditPhone/@item.ID">Редактировать</a>)))
+
+
+<div>
+    <form id="addform">
+        <p><div id="errors" style="color:red;"></div></p>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>@Html.LabelFor(p => p.First().Name)</th>
+                <th>@Html.LabelFor(p => p.First().CompanyID)</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input id="addName" name="Name" />
+                </td>
+                <td>@Html.DropDownList("CompanyID", null, "Выберите компанию", new { @id = "addCompany" })</td>
+                <td></td>
+            </tr>
+        </table>
+        <button id="save" class="btn btn-primary">Сохранить</button>
+        <button id="cancel" class="btn btn-danger btnclear">Отмена</button>
+    </form>
+</div>
+
+<button class="btn btn-default btnclear" id="addPhone">Добавить</button>
