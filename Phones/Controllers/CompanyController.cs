@@ -58,5 +58,18 @@ namespace Phones.Controllers
             }
             else return BadRequest(ModelState);
         }
+
+        [HttpDelete]
+        public IHttpActionResult DeleteCompany(int? id)
+        {
+            Company company = db.Companies.Find(id);
+            if (company != null)
+            {
+                db.Companies.Remove(company);
+                db.SaveChanges();
+                return Ok();
+            }
+            else return BadRequest();
+        }
     }
 }

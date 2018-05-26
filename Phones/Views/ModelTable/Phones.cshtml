@@ -48,13 +48,23 @@
                 $("#addCompany").val("");
             })
         }
+
+        function deleteClick(id) {
+            $.ajax("/api/phone/" + id, {
+                type: 'DELETE',
+                success: function () {
+                    location.reload();
+                }
+            })
+        }
     </script>
 }
 
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Наименование"),
                                     grid.Column("Company.Name",header: "Компания"),
-                                    grid.Column(format: @<a href="~/ModelTable/EditPhone/@item.ID">Редактировать</a>)))
+                                    grid.Column(format: @<a href="~/ModelTable/EditPhone/@item.ID">Редактировать</a>),
+                                    grid.Column(format: @<button id="deletePhone" onclick="deleteClick('@item.ID')">Удалить</button>)))
 
 
 <div>

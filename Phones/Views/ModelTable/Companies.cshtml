@@ -48,6 +48,15 @@
                 $('#errors').empty();
             })
         }
+
+        function deleteClick(id) {
+            $.ajax("/api/company/" + id, {
+                type: 'DELETE',
+                success: function () {
+                    location.reload();
+                }
+            })
+        }
     </script>
 }
 
@@ -56,7 +65,8 @@
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
                                     grid.Column("Active" ,header: "Активно", format: item => item.Active ? "Да" : "Нет"),
-                                    grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>)))
+                                    grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>),
+                                    grid.Column(format: @<button id="deleteCompany" onclick="deleteClick('@item.ID')">Удалить</button>)))
 
 <div>
     <form id="addform">
