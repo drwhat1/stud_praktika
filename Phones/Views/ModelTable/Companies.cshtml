@@ -7,20 +7,21 @@
 @section scripts{
     <script type="text/javascript">
         $(document).ready(function () {
-            saveButtonClick();
-            btnclearClick();
+            save();
+            changeMode();
+            deleteClick();
         })
 
-        function addErrors(jsObj, field) {
+        function addErrors(jsObj, field, mode) {
             if (jsObj['ModelState'][field]) {
                 $.each(jsObj['ModelState'][field], function (index, item) {
-                    $('#errors').append("<p>" + item + "</p>");
+                    $('#'+mode+'errors').append("<p>" + item + "</p>");
                 });
             }
-        }
+        };
 
-        function saveButtonClick() {
-            $("#save").click(function (event) {
+        function save() {
+            $("#saveAdd").click(function (event) {
                 event.preventDefault();
                 $.ajax("/api/company/", {
                     type: "POST",
@@ -30,33 +31,96 @@
                     },
                     error: function (jxqr, error, status) {
                         var response = jxqr.responseJSON;
-                        $('#errors').empty();
-                        addErrors(response, 'company.Name');
-                        addErrors(response, 'company.Location');
-                        addErrors(response, 'company.DateOfFoundation');
+                        $('#adderrors').empty();
+                        addErrors(response, 'company.Name', 'add');
+                        addErrors(response, 'company.Location', 'add');
+                        addErrors(response, 'company.DateOfFoundation', 'add');
                     }
                 })
             })
-        }
 
-        function btnclearClick() {
-            $(".btnclear").click(function (event) {
+            $("#saveEdit").click(function (event) {
                 event.preventDefault();
+                var id = $("#editID").val();
+                $.ajax("/api/company/" + id, {
+                    type: 'PUT',
+                    data: $("#editform").serialize(),
+                    success: function () {
+                        console.log("nice");
+                        document.location.reload();
+                    },
+                    error: function (jxqr, error, status) {
+                        console.log(jxqr);
+                        console.log(error);
+                        console.log(status);
+                        var response = jxqr.responseJSON;
+                        $('#editerrors').empty();
+                        addErrors(response, 'company.Name', 'edit');
+                        addErrors(response, 'company.Location', 'edit');
+                        addErrors(response, 'company.DateOfFoundation', 'edit');
+                    }
+                });
+            })
+        };
+
+        function changeMode() {
+            $("#addButton").click(function (event) {
+                event.preventDefault();
+                $('#adderrors').empty();
                 $(".addInput").val("");
-                $("#addCompany").toggle();
-                $("#addform").toggle();
-                $('#errors').empty();
+                $(".display-mode").css('display', 'none');
+                $(".edit-on").attr("disabled", true);
+                $("#editform").css('display', 'none');
+                $("#addform").css('display', 'block');
+            });
+            $(".display-on").click(function (event) {
+                event.preventDefault();
+                $(".display-mode").css('display', 'block');
+                $(".edit-on").attr("disabled", false);
+                $("#addform").css('display', 'none');
+                $("#editform").css('display', 'none');
+            });
+            $(".edit-on").click(function (event) {
+                event.preventDefault();
+                var id = $(this).attr('id');
+                $.ajax("/api/company/" + id, {
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#editerrors').empty();
+                        $("#editID").val(data.ID);
+                        $("#editName").val(data.Name);
+                        $("#editLocation").val(data.Location);
+                        var date = new Date(Date.parse(data.DateOfFoundation));
+                        var yyyy = date.getFullYear().toString();
+                        var mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based         
+                        var dd = date.getDate().toString();           
+                        console.log(yyyy + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0]));
+                        $("#editDate").val(date.getFullYear() + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0]));
+                        $("#editActive").prop("checked", data.Active);
+                        $(".display-mode").css('display', 'none');
+                        $(".edit-on").attr("disabled", true);
+                        $("#addform").css('display', 'none');
+                        $("#editform").css('display', 'block');
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
             })
         }
 
-        function deleteClick(id) {
-            $.ajax("/api/company/" + id, {
-                type: 'DELETE',
-                success: function () {
-                    location.reload();
-                }
+        function deleteClick() {
+            $(".delete-btn").click(function (event) {
+                var id = $(this).attr('id');
+                $.ajax("/api/company/" + id, {
+                    type: 'DELETE',
+                    success: function () {
+                        location.reload();
+                    }
+                });
             })
-        }
+        };
     </script>
 }
 
@@ -65,12 +129,12 @@
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
                                     grid.Column("Active" ,header: "Активно", format: item => item.Active ? "Да" : "Нет"),
-                                    grid.Column(format: @<a href="~/ModelTable/EditCompany/@item.ID">Редактировать</a>),
-                                    grid.Column(format: @<button id="deleteCompany" onclick="deleteClick('@item.ID')">Удалить</button>)))
+                                    grid.Column(format: @<button id="@item.ID" class="btn btn-info btn-sm edit-on">Редактировать</button>),
+                                    grid.Column(format: @<button id="@item.ID" class="btn btn-danger btn-sm delete-btn edit-on">Удалить</button>)))
 
 <div>
     <form id="addform">
-        <p><div id="errors" style="color:red;"></div></p>
+        <p><div id="adderrors" style="color:red;"></div></p>
         <table class="table">
             <tr>
                 <th></th>
@@ -88,9 +152,32 @@
                 <td></td>
             </tr>
         </table>
-        <button id="save" class="btn btn-primary">Сохранить</button>
-        <button id="cancel" class="btn btn-danger btnclear">Отмена</button>
+        <button id="saveAdd" class="btn btn-primary">Сохранить</button>
+        <button class="btn btn-danger display-on">Отмена</button>
+    </form>
+
+    <form id="editform">
+        <p><div id="editerrors" style="color:red;"></div></p>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>@Html.LabelFor(c => c.First().Name)</th>
+                <th>@Html.LabelFor(c => c.First().Location)</th>
+                <th>@Html.LabelFor(c => c.First().DateOfFoundation)</th>
+                <th>@Html.LabelFor(c => c.First().Active)</th>
+            </tr>
+            <tr>
+                <td><input id="editID" name="ID" readonly type="hidden" /></td>
+                <td><input id="editName" name="Name" /></td>
+                <td><input id="editLocation" name="Location" /></td>
+                <td><input id="editDate" name="DateOfFoundation" type="date"/></td>
+                <td>@Html.CheckBox("Active",new { @id = "editActive" })</td>
+                <td></td>
+            </tr>
+        </table>
+        <button id="saveEdit" class="btn btn-primary">Сохранить</button>
+        <button class="btn btn-danger display-on">Отмена</button>
     </form>
 </div>
 
-<button class="btn btn-default btnclear" id="addCompany">Добавить</button>
+<button class="btn btn-default display-mode" id="addButton" onclick="addingMode()">Добавить</button>
