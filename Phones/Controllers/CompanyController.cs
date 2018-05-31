@@ -13,14 +13,14 @@ namespace Phones.Controllers
     {
         ModelsContext db = new ModelsContext();
 
-        public IHttpActionResult GetCompanies()
+        public IEnumerable<Company> GetCompanies()
         {
-            return Json(db.Companies);
+            return db.Companies.ToList();
         }
 
-        public IHttpActionResult GetCompany(int id)
+        public Company GetCompany(int id)
         {
-            return Json(db.Companies.Find(id));
+            return db.Companies.Find(id);
         }
 
         [HttpPost]

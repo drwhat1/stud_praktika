@@ -28,6 +28,6 @@ namespace Phones.Models
         [Display(Name = "Активно")]
         public bool Active { get; set; }
 
-        public virtual IEnumerable<Phone> Phones { get; set; }
+        public virtual List<Phone> Phones { get; set; }
     }
 }
