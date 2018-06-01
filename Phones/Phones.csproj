@@ -265,7 +265,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\ModelTable\Companies.cshtml" />
     <Content Include="Views\ModelTable\Phones.cshtml" />
-    <Content Include="Views\ModelTable\EditPhone.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

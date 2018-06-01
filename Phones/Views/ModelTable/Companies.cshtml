@@ -46,13 +46,9 @@
                     type: 'PUT',
                     data: $("#editform").serialize(),
                     success: function () {
-                        console.log("nice");
                         document.location.reload();
                     },
                     error: function (jxqr, error, status) {
-                        console.log(jxqr);
-                        console.log(error);
-                        console.log(status);
                         var response = jxqr.responseJSON;
                         $('#editerrors').empty();
                         addErrors(response, 'company.Name', 'edit');
@@ -102,9 +98,6 @@
                         $(".edit-on").attr("disabled", true);
                         $("#addform").css('display', 'none');
                         $("#editform").css('display', 'block');
-                    },
-                    error: function () {
-                        alert("error");
                     }
                 });
             })
@@ -129,8 +122,8 @@
                                     grid.Column("Location", "Штаб-квартира"),
                                     grid.Column("DateOfFoundation", "Дата основания", format: item => item.DateOfFoundation.Date.ToLongDateString()),
                                     grid.Column("Active" ,header: "Активно", format: item => item.Active ? "Да" : "Нет"),
-                                    grid.Column(format: @<button id="@item.ID" class="btn btn-info btn-sm edit-on">Редактировать</button>),
-                                    grid.Column(format: @<button id="@item.ID" class="btn btn-danger btn-sm delete-btn edit-on">Удалить</button>)))
+                                    grid.Column(format: @<text><button id="@item.ID" class="btn btn-info btn-sm edit-on">Редактировать</button>
+                                                               <button id="@item.ID" class="btn btn-danger btn-sm delete-btn">Удалить</button></text>)))
 
 <div>
     <form id="addform">
@@ -180,4 +173,4 @@
     </form>
 </div>
 
-<button class="btn btn-default display-mode" id="addButton" onclick="addingMode()">Добавить</button>
+<button class="btn btn-default display-mode" id="addButton">Добавить</button>

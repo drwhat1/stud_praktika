@@ -7,20 +7,21 @@
 @section scripts{
     <script type="text/javascript">
         $(document).ready(function () {
-            saveButtonClick();
-            btnclearClick();
+            save();
+            changeMode();
+            deleteClick();
         })
 
-        function addErrors(jsObj, field) {
+        function addErrors(jsObj, field, mode) {
             if (jsObj['ModelState'][field]) {
                 $.each(jsObj['ModelState'][field], function (index, item) {
-                    $('#errors').append("<p>" + item + "</p>");
+                    $('#' + mode + 'errors').append("<p>" + item + "</p>");
                 });
             }
-        }
+        };
 
-        function saveButtonClick() {
-            $("#save").click(function (event) {
+        function save() {
+            $("#saveAdd").click(function (event) {
                 event.preventDefault();
                 $.ajax("/api/phone/", {
                     type: "POST",
@@ -30,22 +31,66 @@
                     },
                     error: function (jxqr, error, status) {
                         var response = jxqr.responseJSON;
-                        $('#errors').empty();
-                        addErrors(response, 'phone.Name');
-                        addErrors(response, 'phone.CompanyID');
+                        $('#adderrors').empty();
+                        addErrors(response, 'phone.Name', 'add');
+                        addErrors(response, 'phone.CompanyID', 'add');
                     }
                 })
+            });
+
+            $("#saveEdit").click(function (event) {
+                event.preventDefault();
+                var id = $("#editID").val();
+                $.ajax("/api/phone/" + id, {
+                    type: 'PUT',
+                    data: $("#editform").serialize(),
+                    success: function () {
+                        document.location.reload();
+                    },
+                    error: function (jxqr, error, status) {
+                        var response = jxqr.responseJSON;
+                        $('#editerrors').empty();
+                        addErrors(response, 'phone.Name', 'edit');
+                        addErrors(response, 'phone.CompanyID', 'edit');
+                    }
+                });
             })
         }
 
-        function btnclearClick() {
-            $(".btnclear").click(function (event) {
+        function changeMode() {
+            $("#addButton").click(function (event) {
                 event.preventDefault();
-                $("#addPhone").toggle();
-                $("#addform").toggle();
-                $('#errors').empty();
-                $("#addName").val("");
-                $("#addCompany").val("");
+                $('#adderrors').empty();
+                $(".addInput").val("");
+                $(".display-mode").css('display', 'none');
+                $(".edit-on").attr("disabled", true);
+                $("#editform").css('display', 'none');
+                $("#addform").css('display', 'block');
+            });
+            $(".display-on").click(function (event) {
+                event.preventDefault();
+                $(".display-mode").css('display', 'block');
+                $(".edit-on").attr("disabled", false);
+                $("#addform").css('display', 'none');
+                $("#editform").css('display', 'none');
+            });
+            $(".edit-on").click(function (event) {
+                event.preventDefault();
+                var id = $(this).attr('id');
+                $.ajax("/api/phone/" + id, {
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#editerrors').empty();
+                        $("#editID").val(data.ID);
+                        $("#editName").val(data.Name);
+                        $("#editCompany").val(data.CompanyID);
+                        $(".display-mode").css('display', 'none');
+                        $(".edit-on").attr("disabled", true);
+                        $("#addform").css('display', 'none');
+                        $("#editform").css('display', 'block');
+                    }
+                });
             })
         }
 
@@ -63,13 +108,13 @@
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Наименование"),
                                     grid.Column("Company.Name",header: "Компания"),
-                                    grid.Column(format: @<a href="~/ModelTable/EditPhone/@item.ID">Редактировать</a>),
-                                    grid.Column(format: @<button id="deletePhone" onclick="deleteClick('@item.ID')">Удалить</button>)))
+                                    grid.Column(format: @<text><button id="@item.ID" class="btn btn-info btn-sm edit-on">Редактировать</button>
+                                                               <button id="@item.ID" class="btn btn-danger btn-sm delete-btn">Удалить</button></text>)))
 
 
 <div>
     <form id="addform">
-        <p><div id="errors" style="color:red;"></div></p>
+        <p><div id="adderrors" style="color:red;"></div></p>
         <table class="table">
             <tr>
                 <th></th>
@@ -86,9 +131,29 @@
                 <td></td>
             </tr>
         </table>
-        <button id="save" class="btn btn-primary">Сохранить</button>
-        <button id="cancel" class="btn btn-danger btnclear">Отмена</button>
+        <button id="saveAdd" class="btn btn-primary btn-sm">Сохранить</button>
+        <button class="btn btn-danger btn-sm display-on">Отмена</button>
+    </form>
+
+    <form id="editform">
+        <p><div id="editerrors" style="color:red;"></div></p>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>@Html.LabelFor(p => p.First().Name)</th>
+                <th>@Html.LabelFor(p => p.First().CompanyID)</th>
+            </tr>
+            <tr>
+                <td><input id="editID" name="ID" type="hidden" readonly /></td>
+                <td>
+                    <input id="editName" name="Name" required />
+                </td>
+                <td>@Html.DropDownList("CompanyID",null,new { @id = "editCompany" })</td>
+            </tr>
+        </table>
+        <button class="btn btn-primary btn-sm" id="saveEdit">Сохранить</button>
+        <button class="btn btn-danger btn-sm display-on">Отмена</button>
     </form>
 </div>
 
-<button class="btn btn-default btnclear" id="addPhone">Добавить</button>
+<button class="btn btn-default display-mode" id="addButton">Добавить</button>
