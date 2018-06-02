@@ -62,15 +62,15 @@
                 event.preventDefault();
                 $('#adderrors').empty();
                 $(".addInput").val("");
-                $(".display-mode").css('display', 'none');
-                $(".edit-on").attr("disabled", true);
+                $("#addButton").css('display', 'none');
+                $(".display-mode").attr("disabled", true);
                 $("#editform").css('display', 'none');
                 $("#addform").css('display', 'block');
             });
             $(".display-on").click(function (event) {
                 event.preventDefault();
-                $(".display-mode").css('display', 'block');
-                $(".edit-on").attr("disabled", false);
+                $("#addButton").css('display', 'block');
+                $(".display-mode").attr("disabled", false);
                 $("#addform").css('display', 'none');
                 $("#editform").css('display', 'none');
             });
@@ -85,8 +85,8 @@
                         $("#editID").val(data.ID);
                         $("#editName").val(data.Name);
                         $("#editCompany").val(data.CompanyID);
-                        $(".display-mode").css('display', 'none');
-                        $(".edit-on").attr("disabled", true);
+                        $("#addButton").css('display', 'none');
+                        $(".display-mode").attr("disabled", true);
                         $("#addform").css('display', 'none');
                         $("#editform").css('display', 'block');
                     }
@@ -94,13 +94,16 @@
             })
         }
 
-        function deleteClick(id) {
-            $.ajax("/api/phone/" + id, {
-                type: 'DELETE',
-                success: function () {
-                    location.reload();
-                }
-            })
+        function deleteClick() {
+            $(".delete-btn").click(function (event) {
+                var id = $(this).attr("id");
+                $.ajax("/api/phone/" + id, {
+                    type: 'DELETE',
+                    success: function () {
+                        location.reload();
+                    }
+                })
+            })            
         }
     </script>
 }
@@ -108,8 +111,8 @@
 @grid.GetHtml("table",columns: grid.Columns(grid.Column("ID", "ID"),
                                     grid.Column("Name", "Наименование"),
                                     grid.Column("Company.Name",header: "Компания"),
-                                    grid.Column(format: @<text><button id="@item.ID" class="btn btn-info btn-sm edit-on">Редактировать</button>
-                                                               <button id="@item.ID" class="btn btn-danger btn-sm delete-btn">Удалить</button></text>)))
+                                    grid.Column(format: @<text><button id="@item.ID" class="btn btn-info btn-sm edit-on display-mode">Редактировать</button>
+                                                               <button id="@item.ID" class="btn btn-danger btn-sm delete-btn display-mode">Удалить</button></text>)))
 
 
 <div>
@@ -125,9 +128,9 @@
             <tr>
                 <td></td>
                 <td>
-                    <input id="addName" name="Name" />
+                    <input id="addName" class="addInput" name="Name" />
                 </td>
-                <td>@Html.DropDownList("CompanyID", null, "Выберите компанию", new { @id = "addCompany" })</td>
+                <td>@Html.DropDownList("CompanyID", null, "Выберите компанию", new { @id = "addCompany", @class = "addInput" })</td>
                 <td></td>
             </tr>
         </table>
