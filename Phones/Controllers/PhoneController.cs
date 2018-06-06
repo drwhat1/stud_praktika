@@ -11,8 +11,13 @@ namespace Phones.Controllers
 {
     public class PhoneController : ApiController
     {
-        ModelsContext db = new ModelsContext();
-        
+        ModelsContext db;
+
+        public PhoneController(ModelsContext context)
+        {
+            db = context;
+        }
+
         // GET api/<controller>
         public IEnumerable<Phone> GetPhones()
         {
@@ -29,12 +34,6 @@ namespace Phones.Controllers
         [HttpPost]
         public IHttpActionResult AddPhone(Phone phone)
         {
-            if (phone.CompanyID == 0)
-            {
-                ModelState.Remove("phone.CompanyID");
-                ModelState.AddModelError("phone.CompanyID", "Выберите компанию.");
-            }
-
             if (ModelState.IsValid)
             {
                 db.Phones.Add(phone);
@@ -50,7 +49,10 @@ namespace Phones.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(phone).State = EntityState.Modified;
+                var phoneDB = db.Phones.Find(phone.ID);
+
+                db.Entry(phoneDB).CurrentValues.SetValues(phone);
+                db.Entry(phoneDB).State = EntityState.Modified;
                 db.SaveChanges();
                 return Ok();
             }
