@@ -1,5 +1,9 @@
-﻿#addform, #editform {
+﻿#addPanel, #editPanel {
     display: none;
+}
+
+.form-buttons {
+    padding: 0px 0px 15px 15px;
 }
 
 body {
