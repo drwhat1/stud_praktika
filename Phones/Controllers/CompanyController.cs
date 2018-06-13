@@ -11,7 +11,12 @@ namespace Phones.Controllers
 {
     public class CompanyController : ApiController
     {
-        ModelsContext db = new ModelsContext();
+        ModelsContext db;
+
+        public CompanyController(ModelsContext context)
+        {
+            db = context;
+        }
 
         public IEnumerable<Company> GetCompanies()
         {
@@ -26,12 +31,6 @@ namespace Phones.Controllers
         [HttpPost]
         public IHttpActionResult AddCompany(Company company)
         {
-            ModelState.Remove("company.DateOfFoundation");
-            if (company.DateOfFoundation.Date == new DateTime(1, 1, 1))
-                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания.");
-            else if (company.DateOfFoundation.Year < 1753)
-                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753.");
-
             if (ModelState.IsValid)
             {
                 db.Companies.Add(company);
@@ -44,15 +43,12 @@ namespace Phones.Controllers
         [HttpPut]
         public IHttpActionResult EditCompany(int id, Company company)
         {
-            ModelState.Remove("company.DateOfFoundation");
-            if (company.DateOfFoundation.Date == new DateTime(1,1,1))
-                ModelState.AddModelError("company.DateOfFoundation", "Требуется поле Дата основания.");
-            else if (company.DateOfFoundation.Year < 1753)
-                ModelState.AddModelError("company.DateOfFoundation", "Год не может быть меньше 1753.");
-
             if (ModelState.IsValid)
             {
-                db.Entry(company).State = EntityState.Modified;
+                var companyDB = db.Companies.Find(company.ID);
+
+                db.Entry(companyDB).CurrentValues.SetValues(company);
+                db.Entry(companyDB).State = EntityState.Modified;
                 db.SaveChanges();
                 return Ok();
             }

@@ -17,14 +17,14 @@ namespace Phones.Models
         public int ID { get; set; }
 
         [DataMember]
-        [Required]
+        [Required(ErrorMessage = "Требуется поле Наименование")]
         [Display(Name = "Наименование")]
         public string Name { get; set; }
 
         [DataMember]
-        [Required]
+        [Required(ErrorMessage = "Выберите компанию")]
         [Display(Name = "Компания")]
-        public int CompanyID { get; set; }
+        public int? CompanyID { get; set; }
 
 
         public virtual Company Company { get; set; }

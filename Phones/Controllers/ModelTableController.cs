@@ -9,7 +9,13 @@ namespace Phones.Controllers
 {
     public class ModelTableController : Controller
     {
-        private ModelsContext db = new ModelsContext();
+        ModelsContext db;
+
+        public ModelTableController(ModelsContext context)
+        {
+            db = context;
+        }
+
         // GET: PhonesTable
         public ActionResult Phones()
         {
